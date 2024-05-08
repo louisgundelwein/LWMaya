@@ -1,12 +1,21 @@
-// Beispiel: pages/api/command.js in deinem Next.js-Projekt
+// src/pages/api/test/route.ts
 
-export default function handler(req: any, res: any) {
-	if (req.method === 'POST') {
-		// Verarbeite den Robotersteuerbefehl
-		console.log(req.body); // Logge den empfangenen Befehl
-		// Füge Logik hinzu, um Befehle an den Arduino zu senden
-		res.status(200).json({ message: 'Befehl erhalten' });
-	} else {
-		res.status(405).json({ error: 'Methode nicht erlaubt' });
+import { NextRequest, NextResponse } from 'next/server';
+
+function middleware(req: NextRequest) {
+	if (req.method !== 'POST') {
+		return new NextResponse('Method Not Allowed', { status: 405 });
+	}
+}
+
+export async function POST(req: NextRequest) {
+	try {
+		const data = await req.json();
+		// Führe hier die gewünschten Operationen durch, z.B. Datenbankoperationen
+		// await dboperation(data);
+
+		return new NextResponse('Ok', { status: 200 });
+	} catch (error) {
+		return new NextResponse('Something went wrong', { status: 400 });
 	}
 }

@@ -8,6 +8,7 @@ export default function Home() {
 
 		socket.on('connect', () => {
 			console.log('Connected to WebSocket server');
+			socket.emit('message', 'Hello, you are connected!');
 		});
 
 		return () => {

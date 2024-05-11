@@ -1,20 +1,16 @@
 'use client';
-import { useEffect } from 'react';
-import io from 'socket.io-client';
+
+import ButtonMatrix from './util/button-matrix';
 
 export default function Home() {
-	useEffect(() => {
-		const socket = io();
-
-		socket.on('connect', () => {
-			console.log('Connected to WebSocket server');
-			socket.emit('message', 'Hello, you are connected!');
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	return <div>WebSocket Test Page</div>;
+	return (
+		<div className="flex flex-row justify-center gap-10">
+			<div className="flex flex-col justify-center">
+				<ButtonMatrix startRow={2} startCol={2} rows={4} cols={3} />
+			</div>
+			<div className="flex flex-col justify-center">
+				<ButtonMatrix startRow={2} startCol={7} rows={4} cols={3} />
+			</div>
+		</div>
+	);
 }

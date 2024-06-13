@@ -63,35 +63,11 @@ export default function Home() {
 		toRow: number,
 		toCol: number
 	) => {
-		if (fromBoxId === 'A' && toBoxId === 'A') {
-			setMatrixA((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === toRow && cIndex === toCol) {
-							return true;
-						}
-						if (rIndex === fromRow && cIndex === fromCol) {
-							return false;
-						}
-						return col;
-					})
-				)
-			);
-		} else if (fromBoxId === 'B' && toBoxId === 'B') {
-			setMatrixB((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === toRow && cIndex === toCol) {
-							return true;
-						}
-						if (rIndex === fromRow && cIndex === fromCol) {
-							return false;
-						}
-						return col;
-					})
-				)
-			);
-		} else if (fromBoxId === 'A' && toBoxId === 'B') {
+		console.log(
+			`Moving bottle from (${fromRow}, ${fromCol}) in box ${fromBoxId} to (${toRow}, ${toCol}) in box ${toBoxId}`
+		);
+
+		if (fromBoxId === 'A') {
 			setMatrixA((prevMatrix) =>
 				prevMatrix.map((row, rIndex) =>
 					row.map((col, cIndex) => {
@@ -102,17 +78,7 @@ export default function Home() {
 					})
 				)
 			);
-			setMatrixB((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === toRow && cIndex === toCol) {
-							return true;
-						}
-						return col;
-					})
-				)
-			);
-		} else if (fromBoxId === 'B' && toBoxId === 'A') {
+		} else if (fromBoxId === 'B') {
 			setMatrixB((prevMatrix) =>
 				prevMatrix.map((row, rIndex) =>
 					row.map((col, cIndex) => {
@@ -123,7 +89,21 @@ export default function Home() {
 					})
 				)
 			);
+		}
+
+		if (toBoxId === 'A') {
 			setMatrixA((prevMatrix) =>
+				prevMatrix.map((row, rIndex) =>
+					row.map((col, cIndex) => {
+						if (rIndex === toRow && cIndex === toCol) {
+							return true;
+						}
+						return col;
+					})
+				)
+			);
+		} else if (toBoxId === 'B') {
+			setMatrixB((prevMatrix) =>
 				prevMatrix.map((row, rIndex) =>
 					row.map((col, cIndex) => {
 						if (rIndex === toRow && cIndex === toCol) {
@@ -134,6 +114,11 @@ export default function Home() {
 				)
 			);
 		}
+
+		// Log the current state of both matrices after the move
+		console.log('State of matrixA after move:', matrixA);
+		console.log('State of matrixB after move:', matrixB);
+
 		setSelectedBottle(null);
 	};
 
@@ -146,7 +131,7 @@ export default function Home() {
 					rows={4}
 					cols={3}
 					boxDetails={boxADetails}
-					initialOccupied={matrixA}
+					matrix={matrixA}
 					moveBottle={moveBottle}
 					selectedBottle={selectedBottle}
 					setSelectedBottle={setSelectedBottle}
@@ -157,7 +142,7 @@ export default function Home() {
 					rows={4}
 					cols={3}
 					boxDetails={boxBDetails}
-					initialOccupied={matrixB}
+					matrix={matrixB}
 					moveBottle={moveBottle}
 					selectedBottle={selectedBottle}
 					setSelectedBottle={setSelectedBottle}

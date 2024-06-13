@@ -24,7 +24,7 @@ type ButtonMatrixProps = {
 	rows?: number;
 	cols?: number;
 	boxDetails: BoxDetails; // Prop für Box-Details
-	initialOccupied: boolean[][]; // Initiale belegte Positionen
+	matrix: boolean[][]; // Aktuelle belegte Positionen
 	moveBottle: (
 		fromBoxId: 'A' | 'B',
 		toBoxId: 'A' | 'B',
@@ -134,33 +134,43 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 	rows = 4,
 	cols = 3,
 	boxDetails,
-	initialOccupied,
+	matrix,
 	moveBottle,
 	selectedBottle,
 	setSelectedBottle,
 }) => {
-	const [matrix, setMatrix] = useState<MatrixState[][]>(
-		createInitialState(rows, cols, initialOccupied)
+	const [matrixState, setMatrixState] = useState<MatrixState[][]>(
+		createInitialState(rows, cols, matrix)
 	);
 
 	useEffect(() => {
+		console.log(`Selected bottle: ${JSON.stringify(selectedBottle)}`);
 		if (selectedBottle) {
-			setMatrix((prevMatrix) =>
+			setMatrixState((prevMatrix) =>
 				prevMatrix.map((row) =>
-					row.map((state) => (state === 'occupied' ? 'occupied' : 'selectable'))
+					row.map((state, colIndex) =>
+						state === 'empty' || state === 'selectable' ? 'selectable' : state
+					)
 				)
 			);
 		} else {
-			setMatrix((prevMatrix) =>
-				prevMatrix.map((row) =>
-					row.map((state) => (state === 'selectable' ? 'empty' : state))
-				)
-			);
+			setMatrixState(createInitialState(rows, cols, matrix));
 		}
-	}, [selectedBottle]);
+	}, [selectedBottle, matrix, rows, cols]);
 
 	const handleClick = (localRow: number, localCol: number) => {
-		const currentState = matrix[localRow][localCol];
+		const currentState = matrixState[localRow][localCol];
+		console.log(
+			`Clicked position: (${localRow}, ${localCol}) with state: ${currentState}`
+		);
+
+		// Log the entire matrix state
+		console.log(
+			'Current matrix state:',
+			matrixState.map((row, rowIndex) =>
+				row.map((state, colIndex) => `(${rowIndex}, ${colIndex}): ${state}`)
+			)
+		);
 
 		if (currentState === 'occupied') {
 			setSelectedBottle({
@@ -168,6 +178,9 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 				row: localRow,
 				col: localCol,
 			});
+			console.log(
+				`Selected bottle set to: (${localRow}, ${localCol}) in box ${boxDetails.boxId}`
+			);
 		} else if (currentState === 'selectable' && selectedBottle) {
 			const {
 				row: selectedRow,
@@ -209,6 +222,10 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 				localCol
 			);
 
+			console.log(
+				`Bottle moved from (${selectedRow}, ${selectedCol}) in box ${fromBoxId} to (${localRow}, ${localCol}) in box ${boxDetails.boxId}`
+			);
+
 			setSelectedBottle(null);
 		}
 	};
@@ -222,7 +239,7 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 					gap: '10px',
 				}}
 			>
-				{matrix.map((row, rowIndex) =>
+				{matrixState.map((row, rowIndex) =>
 					row.map((state, colIndex) => (
 						<button
 							key={`matrix-${rowIndex}-${colIndex}`}

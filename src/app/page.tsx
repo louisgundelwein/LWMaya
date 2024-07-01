@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import ButtonMatrix, { BoxDetails } from './util/button-matrix';
+import Controls from './util/controls';
 
 export default function Home() {
 	const boxADetails: BoxDetails = {
@@ -123,7 +124,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="flex flex-col justify-center gap-10 bg-gray-600">
+		<div className="flex flex-col justify-center gap-10 bg-gray-600 h-screen">
 			<div className="flex flex-row justify-center gap-20 p-24">
 				<ButtonMatrix
 					startRow={2}
@@ -148,6 +149,7 @@ export default function Home() {
 					setSelectedBottle={setSelectedBottle}
 				/>
 			</div>
+			<Controls />
 		</div>
 	);
 }

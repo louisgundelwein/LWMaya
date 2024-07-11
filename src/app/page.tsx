@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import ButtonMatrix, { BoxDetails } from './util/button-matrix';
 import Controls from './util/controls';
+import Settings from './util/settings';
 
 export default function Home() {
 	const boxADetails: BoxDetails = {
@@ -126,6 +127,8 @@ export default function Home() {
 	return (
 		<div className="flex flex-col justify-center gap-10 bg-gray-600 h-screen">
 			<div className="flex flex-row justify-center gap-20 p-24">
+				<Settings />
+
 				<ButtonMatrix
 					startRow={2}
 					startCol={2}

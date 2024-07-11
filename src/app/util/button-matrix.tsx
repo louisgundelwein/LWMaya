@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { sendMessageToArduino } from './test-message';
@@ -199,16 +200,22 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 				boxDetails.y
 			);
 
-			const [angleXY, distance] = getAngleAndDistanceToIndex(
+			const [angleXYFrom, distanceFrom] = getAngleAndDistanceToIndex(
+				selectedRow,
+				selectedCol,
+				squareCoords
+			);
+			const [angleXYTo, distanceTo] = getAngleAndDistanceToIndex(
 				localRow,
 				localCol,
 				squareCoords
 			);
 
-			console.log(`Angle: ${angleXY}, Distance: ${distance}`);
+			console.log(`From Angle: ${angleXYFrom}, From Distance: ${distanceFrom}`);
+			console.log(`To Angle: ${angleXYTo}, To Distance: ${distanceTo}`);
 
-			// Sende die Position des Knopfs an den Arduino
-			const posMessage = `POS:${angleXY},${distance}`;
+			// Sende die Position der aktuellen und der neuen Flaschenposition an den Arduino
+			const posMessage = `POS:${angleXYFrom},${distanceFrom},${angleXYTo},${distanceTo}`;
 			console.log('Sending to Arduino:', posMessage);
 			sendMessageToArduino(posMessage);
 

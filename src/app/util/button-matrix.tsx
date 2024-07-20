@@ -127,7 +127,7 @@ const getAngleToCoords = (x, y, middleX) => {
 // Hilfsfunktion zur Berechnung der Entfernung relativ zur mittigen Position
 const getDistanceToCoords = (x, y, middleX) => {
 	console.log({ x, y, value: (Math.sqrt(x * x + y * y) / 16) * 360 });
-	return (Math.sqrt(x * x + y * y) / 34.5) * 360;
+	return (Math.sqrt(x * x + y * y) / 50.265) * 360;
 };
 
 // Hilfsfunktion zur Berechnung von Winkel und Entfernung relativ zum Index

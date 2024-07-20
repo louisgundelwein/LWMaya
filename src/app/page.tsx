@@ -60,9 +60,9 @@ export default function Home() {
 	} | null>(null);
 	const [isBottleStateActive, setIsBottleStateActive] = useState(false);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		const socket = io();
-		socket.on('fromSerial', (data) => {
+		/*socket.on('fromSerial', (data) => {
 			const parsedData = data.split(',');
 			const command = parsedData[0];
 			const boxId = parsedData[1];
@@ -75,11 +75,13 @@ export default function Home() {
 				updateMatrix(boxId, row, col, false);
 			}
 		});
+		
 
 		return () => {
 			socket.disconnect();
 		};
-	}, []);
+}, []);
+	*/
 
 	const moveBottle = (
 		fromBoxId: 'A' | 'B',

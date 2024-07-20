@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-'use client';
 import React, { useState, useEffect } from 'react';
 import { sendMessageToArduino } from './test-message';
 
@@ -38,6 +36,15 @@ type ButtonMatrixProps = {
 	setSelectedBottle: React.Dispatch<
 		React.SetStateAction<{ boxId: 'A' | 'B'; row: number; col: number } | null>
 	>;
+	isBottleStateActive: boolean;
+	updateMatrix: (
+		boxId: 'A' | 'B',
+		row: number,
+		col: number,
+		value: boolean
+	) => void;
+	boxADetails: BoxDetails;
+	boxBDetails: BoxDetails;
 };
 
 // Typ für die Matrix-Zustände
@@ -49,22 +56,22 @@ const createInitialState = (
 	cols: number,
 	initialOccupied: boolean[][]
 ): MatrixState[][] => {
-	return initialOccupied.map((row, rIndex) =>
-		row.map((occupied, cIndex) => (occupied ? 'occupied' : 'empty'))
+	return initialOccupied.map((row) =>
+		row.map((occupied) => (occupied ? 'occupied' : 'empty'))
 	);
 };
 
-// Hilfsfunktion zur Berechnung der Koordinaten
+// Hilfsfunktion zur Berechnung der Koordinaten relativ zur unteren linken Ecke
 const getSquareCoords = (
-	nRows: number,
-	nCols: number,
-	boxHeight: number,
-	boxWidth: number,
-	squareHeight: number,
-	squareWidth: number,
-	leftBottomCornerX: number,
-	leftBottomCornerY: number
-): [number, number][][] => {
+	nRows,
+	nCols,
+	boxHeight,
+	boxWidth,
+	squareHeight,
+	squareWidth,
+	leftBottomCornerX,
+	leftBottomCornerY
+) => {
 	const thicknessSpaceBetweenSquaresVert =
 		(boxHeight - squareHeight * nRows) / (nRows + 1);
 	const thicknessSpaceBetweenSquaresHor =
@@ -82,9 +89,9 @@ const getSquareCoords = (
 		);
 	}
 
-	const coords: [number, number][][] = [];
+	const coords = [];
 	for (let j = 0; j < nRows; j++) {
-		const row: [number, number][] = [];
+		const row = [];
 		for (let i = 0; i < nCols; i++) {
 			const x =
 				leftBottomCornerX +
@@ -103,33 +110,34 @@ const getSquareCoords = (
 	return coords;
 };
 
-const getAngleToCoords = (x: number, y: number): number => {
-	if (x === 0) {
+// Hilfsfunktion zur Berechnung des Winkels relativ zur mittigen Position
+const getAngleToCoords = (x, y, middleX) => {
+	const adjustedX = x - middleX;
+	if (adjustedX === 0) {
 		if (y > 0) return 90;
-		if (y < 0) return 270;
+		if (y < 0) return -90;
 		console.warn('x and y are both 0... Defaulting to 0 angle');
 		return 0;
 	}
 
-	const angle = Math.atan2(y, x) * (180 / Math.PI); // Convert radians to degrees
-	return (angle + 360) % 360; // Normalize angle to be between 0 and 360
+	const angle = Math.atan2(y, adjustedX) * (180 / Math.PI);
+	return angle;
 };
 
-const getDistanceToCoords = (x: number, y: number): number => {
-	return Math.sqrt(x * x + y * y);
+// Hilfsfunktion zur Berechnung der Entfernung relativ zur mittigen Position
+const getDistanceToCoords = (x, y, middleX) => {
+	console.log({ x, y, value: (Math.sqrt(x * x + y * y) / 16) * 360 });
+	return (Math.sqrt(x * x + y * y) / 34.5) * 360;
 };
 
-const getAngleAndDistanceToIndex = (
-	i: number,
-	j: number,
-	squareCoords: [number, number][][]
-): [number, number] => {
+// Hilfsfunktion zur Berechnung von Winkel und Entfernung relativ zum Index
+const getAngleAndDistanceToIndex = (i, j, squareCoords, middleX) => {
 	const [x, y] = squareCoords[i][j];
-	return [getAngleToCoords(x, y), getDistanceToCoords(x, y)];
+	return [getAngleToCoords(x, y, middleX), getDistanceToCoords(x, y, middleX)];
 };
 
 // ButtonMatrix-Komponente
-const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
+const ButtonMatrix = ({
 	startRow,
 	startCol,
 	rows = 4,
@@ -139,17 +147,20 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 	moveBottle,
 	selectedBottle,
 	setSelectedBottle,
+	isBottleStateActive,
+	updateMatrix,
+	boxADetails,
+	boxBDetails,
 }) => {
-	const [matrixState, setMatrixState] = useState<MatrixState[][]>(
+	const [matrixState, setMatrixState] = useState(
 		createInitialState(rows, cols, matrix)
 	);
 
 	useEffect(() => {
-		console.log(`Selected bottle: ${JSON.stringify(selectedBottle)}`);
 		if (selectedBottle) {
 			setMatrixState((prevMatrix) =>
 				prevMatrix.map((row) =>
-					row.map((state, colIndex) =>
+					row.map((state) =>
 						state === 'empty' || state === 'selectable' ? 'selectable' : state
 					)
 				)
@@ -159,81 +170,88 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 		}
 	}, [selectedBottle, matrix, rows, cols]);
 
-	const handleClick = (localRow: number, localCol: number) => {
+	const handleClick = (localRow, localCol) => {
 		const currentState = matrixState[localRow][localCol];
-		console.log(
-			`Clicked position: (${localRow}, ${localCol}) with state: ${currentState}`
-		);
 
-		// Log the entire matrix state
-		console.log(
-			'Current matrix state:',
-			matrixState.map((row, rowIndex) =>
-				row.map((state, colIndex) => `(${rowIndex}, ${colIndex}): ${state}`)
-			)
-		);
-
-		if (currentState === 'occupied') {
-			setSelectedBottle({
-				boxId: boxDetails.boxId,
-				row: localRow,
-				col: localCol,
-			});
-			console.log(
-				`Selected bottle set to: (${localRow}, ${localCol}) in box ${boxDetails.boxId}`
-			);
-		} else if (currentState === 'selectable' && selectedBottle) {
-			const {
-				row: selectedRow,
-				col: selectedCol,
-				boxId: fromBoxId,
-			} = selectedBottle;
-
-			const squareCoords = getSquareCoords(
-				boxDetails.rows,
-				boxDetails.cols,
-				boxDetails.height,
-				boxDetails.width,
-				boxDetails.segmentHeight,
-				boxDetails.segmentWidth,
-				boxDetails.x,
-				boxDetails.y
-			);
-
-			const [angleXYFrom, distanceFrom] = getAngleAndDistanceToIndex(
-				selectedRow,
-				selectedCol,
-				squareCoords
-			);
-			const [angleXYTo, distanceTo] = getAngleAndDistanceToIndex(
+		if (isBottleStateActive) {
+			updateMatrix(
+				boxDetails.boxId,
 				localRow,
 				localCol,
-				squareCoords
+				currentState === 'empty'
 			);
+		} else {
+			if (currentState === 'occupied') {
+				setSelectedBottle({
+					boxId: boxDetails.boxId,
+					row: localRow,
+					col: localCol,
+				});
+			} else if (currentState === 'selectable' && selectedBottle) {
+				const {
+					row: selectedRow,
+					col: selectedCol,
+					boxId: fromBoxId,
+				} = selectedBottle;
 
-			console.log(`From Angle: ${angleXYFrom}, From Distance: ${distanceFrom}`);
-			console.log(`To Angle: ${angleXYTo}, To Distance: ${distanceTo}`);
+				const fromBoxCoords = getSquareCoords(
+					boxDetails.rows,
+					boxDetails.cols,
+					boxDetails.height,
+					boxDetails.width,
+					boxDetails.segmentHeight,
+					boxDetails.segmentWidth,
+					fromBoxId === 'A' ? boxADetails.x : boxBDetails.x,
+					fromBoxId === 'A' ? boxADetails.y : boxBDetails.y
+				);
 
-			// Sende die Position der aktuellen und der neuen Flaschenposition an den Arduino
-			const posMessage = `POS:${angleXYFrom},${distanceFrom},${angleXYTo},${distanceTo}`;
-			console.log('Sending to Arduino:', posMessage);
-			sendMessageToArduino(posMessage);
+				const toBoxCoords = getSquareCoords(
+					boxDetails.rows,
+					boxDetails.cols,
+					boxDetails.height,
+					boxDetails.width,
+					boxDetails.segmentHeight,
+					boxDetails.segmentWidth,
+					boxDetails.x,
+					boxDetails.y
+				);
 
-			// Flasche bewegen
-			moveBottle(
-				fromBoxId,
-				boxDetails.boxId,
-				selectedRow,
-				selectedCol,
-				localRow,
-				localCol
-			);
+				const middleX =
+					(boxADetails.x +
+						boxADetails.width / 2 +
+						boxBDetails.x +
+						boxBDetails.width / 2) /
+					2;
 
-			console.log(
-				`Bottle moved from (${selectedRow}, ${selectedCol}) in box ${fromBoxId} to (${localRow}, ${localCol}) in box ${boxDetails.boxId}`
-			);
+				const [angleXYFrom, distanceFrom] = getAngleAndDistanceToIndex(
+					selectedRow,
+					selectedCol,
+					fromBoxCoords,
+					middleX
+				);
+				const [angleXYTo, distanceTo] = getAngleAndDistanceToIndex(
+					localRow,
+					localCol,
+					toBoxCoords,
+					middleX
+				);
 
-			setSelectedBottle(null);
+				// Sende die Position der aktuellen und der neuen Flaschenposition an den Arduino
+				const posMessage = `POS:${angleXYFrom},${distanceFrom},${angleXYTo},${distanceTo},`;
+				console.log({ posMessage });
+				sendMessageToArduino(posMessage);
+
+				moveBottle(
+					fromBoxId,
+					boxDetails.boxId,
+					selectedRow,
+					selectedCol,
+					localRow,
+					localCol
+				);
+
+				setSelectedBottle(null);
+			}
 		}
 	};
 

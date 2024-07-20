@@ -4,7 +4,7 @@ import { sendMessageToArduino } from './test-message';
 
 const Controls: React.FC = () => {
 	const handleAngleChange = (direction: 'left' | 'right', amount: number) => {
-		const angleChange = direction === 'left' ? -amount : amount;
+		const angleChange = direction === 'left' ? amount : -amount;
 		const angleMessage = `ANGLE:${angleChange}`;
 		sendMessageToArduino(angleMessage);
 	};
@@ -40,7 +40,7 @@ const Controls: React.FC = () => {
 					<div className="flex flex-col items-center gap-2">
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('up', 100)}
+							onClick={() => handleHeightChange('up', 2500)}
 						>
 							↑↑
 						</button>
@@ -59,7 +59,7 @@ const Controls: React.FC = () => {
 						</button>
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('down', 100)}
+							onClick={() => handleHeightChange('down', 200)}
 						>
 							↓↓
 						</button>
@@ -70,13 +70,13 @@ const Controls: React.FC = () => {
 						<div className="flex flex-col justify-center gap-2">
 							<button
 								className="bg-orange-400 rounded-lg w-14 h-8"
-								onClick={() => handleDistanceChange('increase', 20)}
+								onClick={() => handleDistanceChange('increase', 3000)}
 							>
 								↑↑
 							</button>
 							<button
 								className="bg-orange-400 rounded-lg w-14 h-8"
-								onClick={() => handleDistanceChange('increase', 10)}
+								onClick={() => handleDistanceChange('increase', 100)}
 							>
 								↑
 							</button>
@@ -86,7 +86,7 @@ const Controls: React.FC = () => {
 					<div className="flex flex-row justify-center p-2 gap-2">
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleAngleChange('left', 10)}
+							onClick={() => handleAngleChange('left', 40)}
 						>
 							{'<<'}
 						</button>

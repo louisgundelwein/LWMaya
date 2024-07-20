@@ -52,6 +52,24 @@ app.post('/send', (req, res) => {
 	}
 });
 
+// Add this route to handle search requests
+app.post('/search', (req, res) => {
+	if (serialPort.isOpen) {
+		serialPort.write('SEARCH\n', (err) => {
+			if (err) {
+				console.error('Error sending search command to Arduino:', err.message);
+				res
+					.status(500)
+					.json({ error: 'Failed to send search command to Arduino' });
+			} else {
+				res.status(200).json({ success: true });
+			}
+		});
+	} else {
+		res.status(500).json({ error: 'Serial port not open' });
+	}
+});
+
 // Socket connection to send data to the frontend
 io.on('connection', (socket) => {
 	console.log('Client connected');

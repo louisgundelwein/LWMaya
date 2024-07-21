@@ -125,7 +125,7 @@ const Controls: React.FC = () => {
 							</button>
 							<button
 								className="bg-orange-400 rounded-lg w-14 h-8"
-								onClick={() => handleDistanceChange('decrease', 20)}
+								onClick={() => handleDistanceChange('decrease', 3000)}
 							>
 								↓↓
 							</button>

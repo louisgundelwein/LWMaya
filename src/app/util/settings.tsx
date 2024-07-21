@@ -11,6 +11,7 @@ export default function Settings({
 	};
 
 	const handleSetHome = () => {
+		console.log('setHome');
 		sendMessageToArduino('HOME');
 	};
 

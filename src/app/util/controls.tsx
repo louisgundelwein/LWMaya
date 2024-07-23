@@ -40,26 +40,26 @@ const Controls: React.FC = () => {
 					<div className="flex flex-col items-center gap-2">
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('up', 2500)}
+							onClick={() => handleHeightChange('up', 3100)}
 						>
 							↑↑
 						</button>
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('up', 50)}
+							onClick={() => handleHeightChange('up', 100)}
 						>
 							↑
 						</button>
 
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('down', 50)}
+							onClick={() => handleHeightChange('down', 100)}
 						>
 							↓
 						</button>
 						<button
 							className="bg-orange-400 rounded-lg w-14 h-8"
-							onClick={() => handleHeightChange('down', 200)}
+							onClick={() => handleHeightChange('down', 3100)}
 						>
 							↓↓
 						</button>
@@ -119,13 +119,13 @@ const Controls: React.FC = () => {
 						<div className="flex flex-col justify-center gap-2">
 							<button
 								className="bg-orange-400 rounded-lg w-14 h-8"
-								onClick={() => handleDistanceChange('decrease', 10)}
+								onClick={() => handleDistanceChange('decrease', 100)}
 							>
 								↓
 							</button>
 							<button
 								className="bg-orange-400 rounded-lg w-14 h-8"
-								onClick={() => handleDistanceChange('decrease', 3000)}
+								onClick={() => handleDistanceChange('decrease', 2800)}
 							>
 								↓↓
 							</button>

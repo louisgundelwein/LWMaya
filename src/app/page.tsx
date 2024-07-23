@@ -1,182 +1,113 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import ButtonMatrix, { BoxDetails } from './util/button-matrix';
+import React, { useState } from 'react';
+import ButtonMatrix from './util/button-matrix';
 import Controls from './util/controls';
 import Settings from './util/settings';
+import MovementControls from './util/movement-controls'; // Import the new component
 import { sendMessageToArduino } from './util/test-message';
-import io from 'socket.io-client';
-
-const boxADetails: BoxDetails = {
-	boxId: 'A',
-	x: -400,
-	y: 300,
-	z: 0,
-	width: 300,
-	height: 320,
-	depth: 400,
-	rows: 4,
-	cols: 3,
-	segmentWidth: 80,
-	segmentHeight: 80,
-	segmentDepth: 80,
-};
-
-const boxBDetails: BoxDetails = {
-	boxId: 'B',
-	x: 100,
-	y: 300,
-	z: 0,
-	width: 300,
-	height: 320,
-	depth: 400,
-	rows: 4,
-	cols: 3,
-	segmentWidth: 80,
-	segmentHeight: 80,
-	segmentDepth: 80,
-};
+import { staticA, staticB, StaticValues } from './util/static-values';
 
 export default function Home() {
-	const initialOccupiedA = [
-		[true, false, false],
-		[false, false, false],
-		[false, true, false],
-		[false, false, false],
-	];
-
-	const initialOccupiedB = [
-		[false, false, true],
-		[false, false, false],
-		[false, false, false],
-		[true, false, false],
-	];
-
-	const [matrixA, setMatrixA] = useState(initialOccupiedA);
-	const [matrixB, setMatrixB] = useState(initialOccupiedB);
+	const [matrixA, setMatrixA] = useState<StaticValues[]>(staticA);
+	const [matrixB, setMatrixB] = useState<StaticValues[]>(staticB);
 	const [selectedBottle, setSelectedBottle] = useState<{
 		boxId: 'A' | 'B';
-		row: number;
-		col: number;
+		index: number;
 	} | null>(null);
 	const [isBottleStateActive, setIsBottleStateActive] = useState(false);
-
-	/*useEffect(() => {
-		const socket = io();
-		/*socket.on('fromSerial', (data) => {
-			const parsedData = data.split(',');
-			const command = parsedData[0];
-			const boxId = parsedData[1];
-			const row = parseInt(parsedData[2]);
-			const col = parseInt(parsedData[3]);
-
-			if (command === 'BOTTLE:ADD') {
-				updateMatrix(boxId, row, col, true);
-			} else if (command === 'BOTTLE:REMOVE') {
-				updateMatrix(boxId, row, col, false);
-			}
-		});
-		
-
-		return () => {
-			socket.disconnect();
-		};
-}, []);
-	*/
 
 	const moveBottle = (
 		fromBoxId: 'A' | 'B',
 		toBoxId: 'A' | 'B',
-		fromRow: number,
-		fromCol: number,
-		toRow: number,
-		toCol: number
+		fromIndex: number,
+		toIndex: number
 	) => {
-		if (fromBoxId === 'A') {
-			setMatrixA((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === fromRow && cIndex === fromCol) {
-							return false;
-						}
-						return col;
-					})
-				)
-			);
-		} else if (fromBoxId === 'B') {
-			setMatrixB((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === fromRow && cIndex === fromCol) {
-							return false;
-						}
-						return col;
-					})
-				)
-			);
+		if (fromBoxId === 'A' && toBoxId === 'A') {
+			setMatrixA((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[toIndex] = {
+					...updatedMatrix[toIndex],
+					bottle: true,
+					color: prevMatrix[fromIndex].color,
+				};
+				updatedMatrix[fromIndex] = {
+					...updatedMatrix[fromIndex],
+					bottle: false,
+					color: 'Black',
+				};
+				return updatedMatrix;
+			});
+		} else if (fromBoxId === 'B' && toBoxId === 'B') {
+			setMatrixB((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[toIndex] = {
+					...updatedMatrix[toIndex],
+					bottle: true,
+					color: prevMatrix[fromIndex].color,
+				};
+				updatedMatrix[fromIndex] = {
+					...updatedMatrix[fromIndex],
+					bottle: false,
+					color: 'Black',
+				};
+				return updatedMatrix;
+			});
+		} else if (fromBoxId === 'A' && toBoxId === 'B') {
+			setMatrixA((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				return updatedMatrix.map((item, index) =>
+					index === fromIndex
+						? { ...item, bottle: false, color: 'Black' }
+						: item
+				);
+			});
+			setMatrixB((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[toIndex] = {
+					...updatedMatrix[toIndex],
+					bottle: true,
+					color: matrixA[fromIndex].color,
+				};
+				return updatedMatrix;
+			});
+		} else if (fromBoxId === 'B' && toBoxId === 'A') {
+			setMatrixB((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				return updatedMatrix.map((item, index) =>
+					index === fromIndex
+						? { ...item, bottle: false, color: 'Black' }
+						: item
+				);
+			});
+			setMatrixA((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[toIndex] = {
+					...updatedMatrix[toIndex],
+					bottle: true,
+					color: matrixB[fromIndex].color,
+				};
+				return updatedMatrix;
+			});
 		}
-
-		if (toBoxId === 'A') {
-			setMatrixA((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === toRow && cIndex === toCol) {
-							return true;
-						}
-						return col;
-					})
-				)
-			);
-		} else if (toBoxId === 'B') {
-			setMatrixB((prevMatrix) =>
-				prevMatrix.map((row, rIndex) =>
-					row.map((col, cIndex) => {
-						if (rIndex === toRow && cIndex === toCol) {
-							return true;
-						}
-						return col;
-					})
-				)
-			);
-		}
-
-		setSelectedBottle(null);
 	};
 
 	const toggleBottleState = () => {
 		setIsBottleStateActive(!isBottleStateActive);
 	};
 
-	const updateMatrix = (boxId, row, col, value) => {
+	const updateMatrix = (boxId: 'A' | 'B', index: number, value: boolean) => {
 		if (boxId === 'A') {
-			setMatrixA((prevMatrix) =>
-				prevMatrix.map((r, rIndex) =>
-					r.map((c, cIndex) => {
-						if (rIndex === row && cIndex === col) {
-							return value;
-						}
-						return c;
-					})
-				)
-			);
+			setMatrixA((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[index] = { ...updatedMatrix[index], bottle: value };
+				return updatedMatrix;
+			});
 		} else if (boxId === 'B') {
-			setMatrixB((prevMatrix) =>
-				prevMatrix.map((r, rIndex) =>
-					r.map((c, cIndex) => {
-						if (rIndex === row && cIndex === col) {
-							return value;
-						}
-						return c;
-					})
-				)
-			);
-		}
-	};
-
-	const startSearch = async () => {
-		try {
-			await sendMessageToArduino('SEARCH');
-		} catch (error) {
-			console.error('Failed to start search:', error);
+			setMatrixB((prevMatrix) => {
+				const updatedMatrix = [...prevMatrix];
+				updatedMatrix[index] = { ...updatedMatrix[index], bottle: value };
+				return updatedMatrix;
+			});
 		}
 	};
 
@@ -186,40 +117,38 @@ export default function Home() {
 				<Settings
 					toggleBottleState={toggleBottleState}
 					isBottleStateActive={isBottleStateActive}
-					startSearch={startSearch}
+					startSearch={async () => {
+						try {
+							await sendMessageToArduino('SEARCH');
+						} catch (error) {
+							console.error('Failed to start search:', error);
+						}
+					}}
 				/>
-
 				<ButtonMatrix
-					startRow={2}
-					startCol={2}
-					rows={4}
-					cols={3}
-					boxDetails={boxADetails}
-					matrix={matrixA}
+					staticValues={matrixA}
+					boxId="A"
 					moveBottle={moveBottle}
 					selectedBottle={selectedBottle}
 					setSelectedBottle={setSelectedBottle}
 					isBottleStateActive={isBottleStateActive}
 					updateMatrix={updateMatrix}
-					boxADetails={boxADetails}
-					boxBDetails={boxBDetails}
+					matrixA={matrixA}
+					matrixB={matrixB}
 				/>
 				<ButtonMatrix
-					startRow={2}
-					startCol={7}
-					rows={4}
-					cols={3}
-					boxDetails={boxBDetails}
-					matrix={matrixB}
+					staticValues={matrixB}
+					boxId="B"
 					moveBottle={moveBottle}
 					selectedBottle={selectedBottle}
 					setSelectedBottle={setSelectedBottle}
 					isBottleStateActive={isBottleStateActive}
 					updateMatrix={updateMatrix}
-					boxADetails={boxADetails}
-					boxBDetails={boxBDetails}
+					matrixA={matrixA}
+					matrixB={matrixB}
 				/>
 			</div>
+			<MovementControls />
 			<Controls />
 		</div>
 	);

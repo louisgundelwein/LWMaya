@@ -5,8 +5,8 @@ import { sendMessageToArduino } from './test-message';
 const MovementControls: React.FC = () => {
 	const handleKeyDown = (event: KeyboardEvent) => {
 		switch (event.key) {
-      case 'w':
-        console.log("LOL")
+			case 'w':
+				console.log('LOL');
 				sendMessageToArduino('SPEED:2,3500');
 				break;
 			case 's':
@@ -23,6 +23,12 @@ const MovementControls: React.FC = () => {
 				break;
 			case 'e':
 				sendMessageToArduino('SPEED:3,-4000');
+				break;
+			case 'c':
+				sendMessageToArduino('GRIPPER:CLOSE');
+				break;
+			case 'o':
+				sendMessageToArduino('GRIPPER:OPEN');
 				break;
 			default:
 				break;
@@ -65,7 +71,7 @@ const MovementControls: React.FC = () => {
 	}, []);
 
 	return (
-		<div className="movement-controls">
+		<div className="flex flex-row justify-center">
 			Click here and use WASD to move the robot.
 		</div>
 	);

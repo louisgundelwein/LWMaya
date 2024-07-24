@@ -31,7 +31,7 @@ serialPort.open((err) => {
 
 // Handling incoming data from serial port
 serialPort.on('data', (data) => {
-	console.log('Data received from Arduino:', data.toString());
+	console.log(data.toString());
 	io.emit('fromSerial', data.toString());
 });
 

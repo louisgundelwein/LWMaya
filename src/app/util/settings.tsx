@@ -30,9 +30,6 @@ export default function Settings({
 		toggleBottleState();
 	};
 
-	const sendAbort = () => {
-		sendMessageToArduino('ABORT');
-  };
   
   const sendCalibrate = () => {
 		sendMessageToArduino(
@@ -74,6 +71,8 @@ export default function Settings({
 							? 'bg-blue-500'
 							: currentColor === 'Yellow'
 							? 'bg-yellow-500'
+							: currentColor === 'Red'
+							? 'bg-red-500'
 							: currentColor === 'Black'
 							? 'bg-black'
 							: 'bg-gray-500'
@@ -82,9 +81,6 @@ export default function Settings({
 				onClick={toggleColorState}
 			>
 				Color State: {currentColor}
-			</button>
-			<button className="m-4 p-2 bg-red-500 rounded-lg" onClick={sendAbort}>
-				Abort
 			</button>
 		</div>
 	);

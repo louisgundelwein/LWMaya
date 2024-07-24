@@ -7,7 +7,7 @@ import MovementControls from './util/movement-controls'; // Import the new compo
 import { sendMessageToArduino } from './util/test-message';
 import { Color, staticA, staticB, StaticValues } from './util/static-values';
 
-const colors: (Color | 'Off')[] = ['Green', 'Blue', 'Yellow', 'Black', 'Off']; // Add more colors as needed
+const colors: (Color | 'Off')[] = ['Black', 'Blue', 'Yellow', 'Green', 'Red', 'Off']; // Add more colors as needed
 
 export default function Home() {
 	const [matrixA, setMatrixA] = useState<StaticValues[]>(staticA);

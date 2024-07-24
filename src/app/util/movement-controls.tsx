@@ -72,7 +72,7 @@ const MovementControls: React.FC = () => {
 
 	return (
 		<div className="flex flex-row justify-center">
-			Click here and use WASD to move the robot.
+			Click here and use W/A/S/D/Q/E to move the robot and C/O to control the gripper.
 		</div>
 	);
 };

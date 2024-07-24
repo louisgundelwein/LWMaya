@@ -111,17 +111,17 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 		}
 	};
 
-	const colors: Color[] = ['Black', 'Blue', 'Yellow', 'Green', 'White']; // example colors
+	const colors: Color[] = ['Black', 'Blue', 'Yellow', 'Green', 'Red']; // example colors
 
 	return (
-		<div className=" flex flex-row p-4 rounded-2xl bg-red-500 justify-center">
-			<div className="flex flex-col">
+		<div className=" flex flex-row p-4 rounded-2xl bg-red-400 justify-center">
+			<div className="flex flex-col justify-between">
 				<div className="flex flex-row justify-center">
 					<div
 						style={{
 							display: 'grid',
 							gridTemplateColumns: `repeat(3, 50px)`,
-							gap: '10px',
+							gap: '30px',
 						}}
 					>
 						{staticValues.map((value, index) => (
@@ -166,7 +166,7 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 					{colors.map((color) => (
 						<button
 							key={color}
-							className="mt-4 p-2 bg-orange-500 rounded-lg"
+							className={`mt-4 p-2 bg-${color.toLocaleLowerCase()}${(color === 'Black') ? '' : '-500'} rounded-lg`}
 							onClick={() =>
 								clearBoxesByColor(
 									boxId === 'A' ? matrixA : matrixB,
@@ -177,7 +177,7 @@ const ButtonMatrix: React.FC<ButtonMatrixProps> = ({
 								)
 							}
 						>
-							Clear {color}
+							{color}
 						</button>
 					))}
 				</div>

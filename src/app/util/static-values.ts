@@ -1,4 +1,4 @@
-export type Color = 'Black' | 'Blue' | 'Yellow' | 'Green' | 'White'
+export type Color = 'Black' | 'Blue' | 'Yellow' | 'Green' | 'White' | 'Red'
 
 export type StaticValues = {
   id: number,

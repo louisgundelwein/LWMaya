@@ -10,7 +10,7 @@ export type StaticValues = {
 
 }
 
-const angleOffSet = 2;
+const angleOffSet = 3;
 const distanceOffSet = -90;
 
 export const staticA: StaticValues[] = [
